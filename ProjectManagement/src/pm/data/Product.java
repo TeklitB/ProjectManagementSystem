@@ -1,9 +1,12 @@
 package pm.data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Objects;
+
 import static java.math.RoundingMode.HALF_UP;
 
-public class Product {
+public abstract class Product {
 
 	public static final BigDecimal DISCOUNT_RATE = BigDecimal.valueOf(0.1);
 	private int id;
@@ -11,11 +14,11 @@ public class Product {
 	private BigDecimal price;
 	private Rating rating;
 
-	public Product() {
+	Product() {
 		this(0, "no name", BigDecimal.ZERO);
 	}
 
-	public Product(int id, String name, BigDecimal price, Rating rating) {
+	Product(int id, String name, BigDecimal price, Rating rating) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -65,7 +68,42 @@ public class Product {
 		return price.multiply(DISCOUNT_RATE).setScale(2, HALF_UP);
 	}
 
-	public Product applyRating(Rating newRating) {
-		return new Product(id, name, price, newRating);
+	public abstract Product applyRating(Rating newRating);
+//	{
+//		return new Product(id, name, price, newRating);
+//	}
+
+	public LocalDate getBestBefore() {
+		return LocalDate.now();
 	}
+
+	@Override
+	public String toString() {
+		return id + ", " + name + ", " + price + ", " + getDiscount() + ", " + rating.getStars() + ", "
+				+ getBestBefore();
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 5;
+		hash = 23 * hash + this.id;
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+//		if(obj != null && getClass() == obj.getClass()) {
+		if (obj instanceof Product) {
+			final Product other = (Product) obj;
+			return this.id == other.id && Objects.equals(this.name, other.name);
+		}
+		return false;
+	}
+
+	// Hashcode represent an immutable property of the object, a kind of unique
+	// identity
+
 }
